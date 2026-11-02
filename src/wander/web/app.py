@@ -4,6 +4,7 @@ Flow the browser follows:
   POST /api/discover  -> Spark picks destinations (and the style anchor is ensured, in parallel)
   POST /api/postcard  -> one call per card, fired concurrently, so cards fill in as they finish
   POST /api/choose    -> the traveler picks a place
+  POST /api/reveal    -> the chosen postcard comes alive (Spark looks, SAM cuts, we render an MP4)
   GET  /api/spend     -> local ledger summary for the on-screen spend meter
 """
 
@@ -25,6 +26,7 @@ from pydantic import BaseModel, Field
 from ..client import ImageGenerationError
 from ..ledger import BudgetExceeded, Ledger
 from ..pipeline import WanderClient, ensure_style_anchor, make_postcard, suggest_destinations
+from ..reveal.pipeline import bring_to_life
 from ..schemas import Destination, Feedback, TripBrief
 
 log = logging.getLogger("wander.web")
@@ -54,6 +56,11 @@ class ChooseRequest(BaseModel):
     dest_id: str
 
 
+class RevealRequest(BaseModel):
+    session_id: str
+    dest_id: str
+
+
 @dataclass
 class Session:
     id: str
@@ -61,6 +68,8 @@ class Session:
     round_no: int = 0
     seen: list[str] = field(default_factory=list)
     dests: dict[str, Destination] = field(default_factory=dict)
+    images: dict[str, Path] = field(default_factory=dict)  # dest_id -> painted postcard file on disk
+    reveals: dict[str, dict] = field(default_factory=dict)  # dest_id -> finished reveal (so re-opening is instant)
     chosen: str | None = None
 
 
@@ -143,6 +152,7 @@ def create_app(client: WanderClient, ledger: Ledger, state_dir: Path, out_dir: P
             path = make_postcard(client, anchor, dest, media_dir / sess.id, draft=not req.final)
         except Exception as exc:  # noqa: BLE001
             raise fail(exc) from exc
+        sess.images[req.dest_id] = path  # remembered so /api/reveal can find the file later
         return {"url": f"/media/{sess.id}/{path.name}"}
 
     @app.post("/api/choose")
@@ -153,6 +163,38 @@ def create_app(client: WanderClient, ledger: Ledger, state_dir: Path, out_dir: P
             raise HTTPException(404, "Unknown destination.")
         sess.chosen = req.dest_id
         return _public(req.dest_id, dest)
+
+    reveal_locks: dict[tuple[str, str], threading.Lock] = {}
+
+    @app.post("/api/reveal")
+    def reveal(req: RevealRequest) -> dict:
+        """Animate the chosen postcard. Slow (several seconds), so the browser shows a status line.
+
+        FastAPI runs plain `def` endpoints in a worker thread, so a long render here does not freeze
+        other requests. A per-postcard lock stops a double-click from rendering the same video twice.
+        """
+        sess = get_session(req.session_id)
+        if req.dest_id not in sess.dests:
+            raise HTTPException(404, "Unknown destination.")
+        image = sess.images.get(req.dest_id)
+        if image is None or not image.is_file():
+            raise HTTPException(409, "Wait for the postcard to finish painting first.")
+
+        with lock:
+            key_lock = reveal_locks.setdefault((sess.id, req.dest_id), threading.Lock())
+        with key_lock:
+            done = sess.reveals.get(req.dest_id)
+            if done is None:
+                out = media_dir / sess.id / f"{image.stem}-reveal.mp4"
+                try:
+                    result = bring_to_life(client, image, out)
+                except Exception as exc:  # noqa: BLE001
+                    raise fail(exc) from exc
+                for note in result.notes:  # internals stay in the server log, not in the browser
+                    log.info("reveal %s: %s", req.dest_id, note)
+                done = {"video_url": f"/media/{sess.id}/{out.name}", "mode": result.mode, "layers": result.layers}
+                sess.reveals[req.dest_id] = done
+        return done
 
     @app.get("/api/spend")
     def spend() -> dict:

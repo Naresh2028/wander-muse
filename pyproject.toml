@@ -12,6 +12,10 @@ dependencies = [
     "pydantic>=2.6",
     "fastapi>=0.110",
     "uvicorn>=0.29",
+    "meta-sam-parser>=0.1",
+    "opencv-python-headless>=4.9",
+    "numpy>=1.26",
+    "imageio-ffmpeg>=0.5",
 ]
 
 [project.optional-dependencies]

@@ -39,6 +39,10 @@ class Settings:
     base_url: str = "https://api.meta.ai/v1"
     text_model: str = "muse-spark-1.3"
     image_model: str = "muse-image-1.0"
+    sam_model: str = "sam-3.1"
+    # SAM sees a shrunk copy of the postcard. The official mask decoder is pure Python, so decode
+    # time grows with pixel count (about 1.2s per full-frame mask at 768x512, 5.7s at 1536x1024).
+    sam_max_side: int = 768
     # Hard cap enforced locally. $150 credit minus a $30 reserve for surprises.
     budget_usd: float = 120.0
     state_dir: Path = Path(".wander")
@@ -61,6 +65,7 @@ class Settings:
             base_url=os.environ.get("WANDER_BASE_URL", cls.base_url),
             text_model=os.environ.get("WANDER_TEXT_MODEL", cls.text_model),
             image_model=os.environ.get("WANDER_IMAGE_MODEL", cls.image_model),
+            sam_model=os.environ.get("WANDER_SAM_MODEL", cls.sam_model),
             budget_usd=float(os.environ.get("WANDER_BUDGET_USD", cls.budget_usd)),
             state_dir=Path(os.environ.get("WANDER_STATE_DIR", ".wander")),
             image_tool_controls=os.environ.get("WANDER_IMAGE_TOOL_CONTROLS", "1") != "0",

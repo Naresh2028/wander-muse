@@ -30,7 +30,7 @@ is used in the final experience). Track: *Build for Your World*.
  [6 SHARE]   static HTML storybook + mp4, every factual claim marked "verify before booking"
 ```
 
-Phases 1 to 3 are implemented (`src/wander/pipeline.py`, `src/wander/web/`). Everything else builds on the same client,
+Phases 1 to 4 are implemented (`src/wander/pipeline.py`, `src/wander/web/`, `src/wander/reveal/`). Everything else builds on the same client,
 cache and ledger.
 
 Web flow: the browser calls `POST /api/discover` (Spark picks places while the style anchor is ensured in parallel),
@@ -57,6 +57,8 @@ stays on the server).
   motion from real segmentation masks, no text rendered inside images (typography is added in HTML).
 * **Model use:** Muse Image is on screen in every step, and the cookbook's *anchored image series* technique keeps the
   look consistent from postcard to storybook.
+
+See `docs/CODE_TOUR.md` for the file-by-file flow and the reasoning behind it.
 
 ## Cost control (verified prices, 2026-10-29)
 
@@ -89,7 +91,7 @@ a persistent ledger (`.wander/ledger.jsonl`), and a disk cache so identical requ
 |---|---|
 | Oct 29 | Smoke test passes, slice 1 produces a real postcard sheet, repo public, first commits |
 | Oct 30 | Small web UI (Gradio or Streamlit) with the react-and-narrow loop; optional voice input |
-| Oct 31 | Reveal: SAM masks to parallax layers to a looping mp4 |
+| Oct 30-31 | Reveal: SAM masks to parallax layers to a looping mp4 (built Oct 30; live tuning Oct 31) |
 | Nov 1 | Itinerary with grounding and sources, plus anchored day-panel storybook |
 | Nov 2 | Polish, three showcase runs, README screenshots. **Feature freeze at the end of the day** |
 | Nov 3 | Record the 3-minute demo, test from a clean clone, ask any last questions |

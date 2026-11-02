@@ -89,7 +89,10 @@ button { font: inherit; cursor: pointer; }
 .refine .row { margin-top: 8px; }
 
 #chosen { max-width: 860px; margin: 0 auto; }
-.stage { width: 100%; height: auto; display: block; border-radius: 6px; box-shadow: var(--shadow); background: #eadfc6; }
+.stage { position: relative; border-radius: 6px; overflow: hidden; box-shadow: var(--shadow); background: #eadfc6; }
+.stage img, .stage video { width: 100%; height: auto; display: block; }
+.stage.working::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(110deg, transparent 35%, rgba(255, 255, 255, .35) 50%, transparent 65%); background-size: 220% 100%; animation: shimmer 2.4s linear infinite; }
+.reveal-status { color: var(--muted); font-style: italic; margin: 10px 2px 0; min-height: 1.5em; }
 #chosen h2 { font-size: 2rem; margin-top: 18px; }
 .next { margin-top: 22px; padding: 16px 20px; border: 1px dashed var(--accent); border-radius: 8px; color: var(--muted); }
 

@@ -187,12 +187,55 @@ async function discover(body) {
   }
 }
 
+/**
+ * The Reveal, seen from the browser's side:
+ *   1. we already show the still postcard (instant, nothing to wait for)
+ *   2. we ask the server to animate it (POST /api/reveal; takes several seconds)
+ *   3. when the answer arrives we swap the <img> for a looping <video>
+ * The status line tells the person what is happening, and what the models did.
+ */
+async function startReveal(d, stage, statusEl, posterUrl) {
+  stage.classList.add("working");
+  try {
+    const r = await api("/api/reveal", { session_id: state.sessionId, dest_id: d.id });
+    if (!stage.isConnected) return; // they went back or started over while we were rendering
+    const video = h("video", {
+      src: r.video_url,
+      poster: posterUrl,
+      loop: true,
+      playsinline: true,
+      "aria-label": `Animated postcard of ${d.name}`,
+    });
+    video.muted = true; // browsers only autoplay muted video, and the attribute alone is not always honoured
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduceMotion) video.controls = true; // respect the OS setting: the person presses play
+    stage.replaceChildren(video);
+    if (!reduceMotion) video.play().catch(() => (video.controls = true));
+    statusEl.textContent =
+      r.mode === "parallax"
+        ? `Alive: SAM 3.1 cut this painting into ${r.layers.length} layers (${r.layers.join(", ")}) and the camera drifts through them.`
+        : "Alive: a slow camera move across the painting.";
+  } catch (err) {
+    statusEl.textContent = `Couldn't animate this one (${err.message}). The postcard still stands.`;
+  } finally {
+    stage.classList.remove("working");
+    refreshMeter();
+  }
+}
+
 async function choose(d) {
   try {
     const chosen = await api("/api/choose", { session_id: state.sessionId, dest_id: d.id });
     const url = state.images.get(d.id);
+    const stage = h(
+      "div",
+      { class: "stage" },
+      url ? h("img", { src: url, alt: `Painted postcard of ${chosen.name}, ${chosen.country}` }) : null,
+    );
+    const revealStatus = h("p", { class: "reveal-status", "aria-live": "polite" }, url ? "Bringing this postcard to life…" : "");
     $("#chosen-body").replaceChildren(
-      url ? h("img", { class: "stage", src: url, alt: `Painted postcard of ${chosen.name}, ${chosen.country}` }) : null,
+      stage,
+      revealStatus,
       h("h2", {}, chosen.name),
       h("div", { class: "country" }, chosen.country),
       h("p", { class: "tag" }, chosen.tagline),
@@ -208,6 +251,7 @@ async function choose(d) {
     $("#deck").hidden = true;
     $("#chosen").hidden = false;
     window.scrollTo({ top: 0, behavior: "smooth" });
+    if (url) startReveal(d, stage, revealStatus, url); // deliberately not awaited: the page is usable meanwhile
   } catch (err) {
     showError(err.message);
   }

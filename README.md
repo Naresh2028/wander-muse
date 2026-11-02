@@ -24,7 +24,8 @@ python scripts/first_slice.py --vibe "I want to feel small near something enormo
 Open the `out/run-.../index.html` path that the script prints, or start the web app:
 
 ```bash
-python scripts/run_ui.py          # then open http://127.0.0.1:8000
+python scripts/run_ui.py          # then open http://127.0.0.1:8000 (choose a postcard: it comes alive)
+python scripts/reveal_probe.py <postcard.webp>   # debug the Reveal step by step
 ```
 
 ## What works today
@@ -44,7 +45,7 @@ src/wander/client.py     Meta Model API wrapper (Spark JSON, Muse Image + refere
 src/wander/pipeline.py   vibe -> destinations -> postcards
 src/wander/render.py     static HTML postcard sheet (command-line slice)
 src/wander/web/          FastAPI app + postcard-deck frontend (static/index.html, style.css, app.js)
-scripts/                 smoke_test.py, first_slice.py, run_ui.py
+scripts/                 smoke_test.py, first_slice.py, run_ui.py, reveal_probe.py
 tests/                   offline tests using a stub SDK (API, pipeline, client, ledger)
 ```
 

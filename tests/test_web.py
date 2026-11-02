@@ -88,6 +88,59 @@ def test_budget_cap_returns_402(make_client, tmp_path):
     assert r.status_code == 402 and "cap" in r.json()["detail"]
 
 
+def _script_reveal(sdk, scene):
+    """Make the stubbed Muse Image paint the synthetic scene, Spark plan layers, SAM return masks."""
+    import json
+
+    import cv2
+
+    from conftest import sam_line
+    from wander.schemas import DestinationSet
+
+    plan = json.dumps({"layers": [{"concept": "sky", "depth": 0.0}, {"concept": "mountain", "depth": 0.4}, {"concept": "sailboat", "depth": 0.9}]})
+    dests = DestinationSet(destinations=sdk.dests).model_dump_json()
+    sdk.chat_reply = lambda kw: plan if kw["response_format"]["json_schema"]["name"] == "LayerPlan" else dests
+    sdk.sam_reply = lambda concept: sam_line([scene[1][concept]])
+    sdk.image_bytes = cv2.imencode(".png", scene[0])[1].tobytes()
+
+
+def test_reveal_endpoint_animates_a_painted_postcard(web, scene):
+    tc, sdk, ledger, _ = web
+    _script_reveal(sdk, scene)
+    sid = discover(tc)["session_id"]
+    assert tc.post("/api/postcard", json={"session_id": sid, "dest_id": "r0-0"}).status_code == 200
+
+    r = tc.post("/api/reveal", json={"session_id": sid, "dest_id": "r0-0"})
+    assert r.status_code == 200, r.text
+    data = r.json()
+    assert data["mode"] == "parallax" and data["layers"] == ["sky", "mountain", "sailboat"]
+    video = tc.get(data["video_url"])
+    assert video.status_code == 200 and video.headers["content-type"] == "video/mp4" and len(video.content) > 1000
+
+    # Asking again (re-opening the postcard) is instant and costs nothing more
+    before = (len(sdk.calls["sam"]), ledger.total)
+    again = tc.post("/api/reveal", json={"session_id": sid, "dest_id": "r0-0"})
+    assert again.json() == data and (len(sdk.calls["sam"]), ledger.total) == before
+
+
+def test_reveal_before_the_postcard_is_painted_is_a_clear_409(web):
+    tc, *_ = web
+    sid = discover(tc)["session_id"]
+    r = tc.post("/api/reveal", json={"session_id": sid, "dest_id": "r0-1"})
+    assert r.status_code == 409 and "painting" in r.json()["detail"]
+    assert tc.post("/api/reveal", json={"session_id": sid, "dest_id": "nope"}).status_code == 404
+
+
+def test_reveal_degrades_to_a_cinematic_move_when_sam_finds_nothing(web, scene):
+    tc, sdk, *_ = web
+    _script_reveal(sdk, scene)
+    sdk.sam_reply = lambda concept: ""
+    sid = discover(tc)["session_id"]
+    tc.post("/api/postcard", json={"session_id": sid, "dest_id": "r0-2"})
+    r = tc.post("/api/reveal", json={"session_id": sid, "dest_id": "r0-2"})
+    assert r.status_code == 200 and r.json()["mode"] == "cinematic" and r.json()["layers"] == []
+
+
 def test_spend_endpoint(web):
     tc, *_ = web
     discover(tc)

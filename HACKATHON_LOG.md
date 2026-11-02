@@ -12,5 +12,6 @@ Code assistance: Claude (Anthropic) was used as a pair-programming assistant for
 
 | Date (2026) | What was built |
 |---|---|
+| Oct 30 | Reveal: Muse Spark vision plans layers, SAM 3.1 cuts them (official meta-sam-parser), fill-behind layer builder, looping parallax mp4 via ffmpeg, cinematic fallback, `/api/reveal` endpoint wired into the UI, probe script and layers debug sheet. 40 offline tests. |
 | Oct 29 (later) | Web UI: FastAPI backend (discover, per-card postcard painting, choose, spend meter), react-and-narrow loop (love / not this / free-text note feeds the next Spark round, already-shown places are never repeated), postcard-deck frontend in vanilla JS, browser-verified end to end against a stub API. First successful live calls to Muse Spark and Muse Image. |
 | Oct 29 | Repo created. Config, spend ledger with hard cap, disk cache, Meta client (Spark structured output + Muse Image with reference images), prompts, first pipeline slice, HTML postcard sheet, smoke test, offline tests. |
