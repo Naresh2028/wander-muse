@@ -21,13 +21,18 @@ python scripts/smoke_test.py                           # ~3 cents: proves your k
 python scripts/first_slice.py --vibe "I want to feel small near something enormous, and eat well"
 ```
 
-Open the `out/run-.../index.html` path that the script prints.
+Open the `out/run-.../index.html` path that the script prints, or start the web app:
+
+```bash
+python scripts/run_ui.py          # then open http://127.0.0.1:8000
+```
 
 ## What works today
 
 * Vague vibe to four distinct destinations (Muse Spark, schema-validated JSON)
-* One style-anchor image, then four postcards that reuse it as a reference (Muse Image)
-* A static HTML postcard sheet, with all model text escaped
+* One style-anchor image, then postcards that reuse it as a reference (Muse Image), painted card by card in the browser
+* Narrowing loop: love / not this / a free-text note steers the next round, and places already shown never repeat
+* Live spend meter and a hard local cap; all model text is rendered as plain text (no HTML injection)
 
 ## Repo map
 
@@ -37,9 +42,10 @@ src/wander/ledger.py     persistent spend ledger with a hard cap
 src/wander/cache.py      disk cache, so identical calls are never paid twice
 src/wander/client.py     Meta Model API wrapper (Spark JSON, Muse Image + reference images, retries)
 src/wander/pipeline.py   vibe -> destinations -> postcards
-src/wander/render.py     HTML postcard sheet
-scripts/                 smoke_test.py, first_slice.py
-tests/                   offline tests using a stub SDK
+src/wander/render.py     static HTML postcard sheet (command-line slice)
+src/wander/web/          FastAPI app + postcard-deck frontend (static/index.html, style.css, app.js)
+scripts/                 smoke_test.py, first_slice.py, run_ui.py
+tests/                   offline tests using a stub SDK (API, pipeline, client, ledger)
 ```
 
 ## Cost control

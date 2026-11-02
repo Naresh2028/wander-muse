@@ -18,6 +18,14 @@ class TripBrief(BaseModel):
     avoid: list[str] = Field(default_factory=list)
 
 
+class Feedback(BaseModel):
+    """How the traveler reacted to a round of postcards. Drives the narrowing loop."""
+
+    liked: list[str] = Field(default_factory=list, description="Names of destinations they loved.")
+    disliked: list[str] = Field(default_factory=list, description="Names of destinations they rejected.")
+    note: str | None = Field(default=None, description="Free text such as 'more water, fewer crowds'.")
+
+
 class Destination(BaseModel):
     name: str = Field(description="Place name, specific enough to look up (city, island, region).")
     country: str

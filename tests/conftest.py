@@ -18,10 +18,10 @@ PNG_1PX = base64.b64decode(
 )
 
 
-def make_destinations(n=4):
+def make_destinations(n=4, prefix="Place"):
     return [
         Destination(
-            name=f"Place {i} <b>",
+            name=f"{prefix} {i} <b>",
             country="Nowhere",
             tagline="A quiet tagline",
             why_it_fits="Because it fits. Truly.",
@@ -43,12 +43,13 @@ class StubSDK:
         self.dests = dests or make_destinations()
         self.calls = {"chat": [], "responses": []}
         self.prompt_tokens, self.completion_tokens, self.image_ok = prompt_tokens, completion_tokens, image_ok
+        self.chat_reply = None  # callable(kwargs) -> JSON string, to script Spark answers
         self.chat = SimpleNamespace(completions=SimpleNamespace(create=self._chat))
         self.responses = SimpleNamespace(create=self._responses)
 
     def _chat(self, **kw):
         self.calls["chat"].append(kw)
-        content = DestinationSet(destinations=self.dests).model_dump_json()
+        content = self.chat_reply(kw) if self.chat_reply else DestinationSet(destinations=self.dests).model_dump_json()
         return SimpleNamespace(
             choices=[SimpleNamespace(message=SimpleNamespace(content=content))],
             usage=SimpleNamespace(prompt_tokens=self.prompt_tokens, completion_tokens=self.completion_tokens),

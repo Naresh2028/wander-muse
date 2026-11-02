@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Wander</title>
+  <meta name="description" content="A travel muse for people who don't know where to go.">
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <header class="masthead">
+    <h1>Wander</h1>
+    <p class="sub">a travel muse for people who don't know where to go</p>
+  </header>
+
+  <main>
+    <section id="ask" class="panel">
+      <form id="ask-form" autocomplete="off">
+        <label for="vibe" class="big">What does your heart want, even if you can't say where?</label>
+        <textarea id="vibe" rows="3" maxlength="600" required
+          placeholder="to feel small next to something enormous, eat very well, and not talk to anyone for a day"></textarea>
+        <div class="row">
+          <label>Days <input id="days" type="number" min="1" max="60" value="5"></label>
+          <label>Budget
+            <select id="budget">
+              <option value="shoestring">Shoestring</option>
+              <option value="comfortable" selected>Comfortable</option>
+              <option value="splurge">Splurge</option>
+            </select>
+          </label>
+          <label class="grow">Avoid <input id="avoid" type="text" maxlength="120" placeholder="crowds, long flights"></label>
+        </div>
+        <div class="row end">
+          <label class="check"><input id="final" type="checkbox"> Final quality (slower)</label>
+          <button id="go" class="primary" type="submit">Show me places</button>
+        </div>
+      </form>
+      <p id="ask-error" class="error" role="alert" hidden></p>
+    </section>
+
+    <section id="deck" hidden aria-live="polite">
+      <div class="deck-head">
+        <h2 id="deck-title">Four places that might be yours</h2>
+        <button id="restart" class="link" type="button">Start over</button>
+      </div>
+      <p id="deck-status" class="status"></p>
+      <div id="cards" class="cards"></div>
+      <form id="refine-form" class="refine" autocomplete="off">
+        <label for="note">Tell me more, or less, of anything. Mark the postcards you love or don't.</label>
+        <div class="row">
+          <input id="note" class="grow" type="text" maxlength="400" placeholder="more water, fewer crowds, something older">
+          <button id="again" class="primary" type="submit">Wander again</button>
+        </div>
+      </form>
+      <p id="deck-error" class="error" role="alert" hidden></p>
+    </section>
+
+    <section id="chosen" hidden>
+      <button id="back" class="link" type="button">&larr; Back to the postcards</button>
+      <div id="chosen-body"></div>
+    </section>
+  </main>
+
+  <footer>
+    <span id="meter" aria-label="Spend so far"></span>
+    <span>Suggestions are AI-generated. Verify prices, seasons and entry rules before you book.</span>
+  </footer>
+
+  <script src="/static/app.js" defer></script>
+</body>
+</html>

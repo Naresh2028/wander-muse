@@ -1,0 +1,109 @@
+:root {
+  --paper: #f4ecdc;
+  --card: #fffaf0;
+  --ink: #2b2118;
+  --muted: #7a6a58;
+  --accent: #b5532f;
+  --leaf: #4f7a45;
+  --line: #e4d6bb;
+  --shadow: 0 8px 22px rgba(60, 40, 10, .14);
+  --serif: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0; background: var(--paper); color: var(--ink);
+  font: 17px/1.55 var(--serif);
+  background-image: radial-gradient(rgba(120, 90, 40, .05) 1px, transparent 1px);
+  background-size: 18px 18px;
+}
+h1, h2, h3 { font-weight: 600; margin: 0; }
+
+.masthead { text-align: center; padding: 44px 20px 10px; }
+.masthead h1 { font-size: clamp(2.6rem, 8vw, 4rem); letter-spacing: .06em; }
+.sub { margin: 6px 0 0; color: var(--muted); font-style: italic; }
+
+main { max-width: 1120px; margin: 0 auto; padding: 18px 20px 40px; }
+.panel { background: var(--card); border: 1px solid var(--line); border-radius: 8px; box-shadow: var(--shadow); padding: 24px; max-width: 760px; margin: 0 auto; }
+
+label.big { display: block; font-size: 1.25rem; margin-bottom: 10px; }
+textarea, input[type="text"], input[type="number"], select {
+  font: inherit; color: inherit; background: #fffdf7; border: 1px solid var(--line); border-radius: 6px; padding: 9px 11px; width: 100%;
+}
+textarea { resize: vertical; }
+textarea:focus, input:focus, select:focus, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.row { display: flex; gap: 14px; flex-wrap: wrap; align-items: flex-end; margin-top: 14px; }
+.row label { font-size: .9rem; color: var(--muted); display: flex; flex-direction: column; gap: 4px; }
+.row input[type="number"], .row select, .row input[type="text"] { height: 42px; }
+.row input[type="number"] { width: 84px; }
+.row select { width: 150px; }
+.grow { flex: 1 1 200px; }
+.end { justify-content: space-between; align-items: center; }
+.check { flex-direction: row !important; align-items: center; gap: 8px !important; }
+.check input { width: auto; }
+
+button { font: inherit; cursor: pointer; }
+.primary { background: var(--accent); color: #fff; border: 0; border-radius: 6px; padding: 10px 20px; font-weight: 600; letter-spacing: .02em; }
+.primary:hover { background: #9d4524; }
+.primary[disabled] { opacity: .55; cursor: progress; }
+.link { background: none; border: 0; color: var(--accent); text-decoration: underline; padding: 4px; white-space: nowrap; }
+
+.error { color: #a02a1a; margin: 12px 0 0; }
+.status { color: var(--muted); font-style: italic; min-height: 1.5em; margin: 4px 0 14px; }
+
+.deck-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin-top: 8px; }
+.deck-head h2 { font-size: 1.5rem; }
+
+.cards { display: grid; gap: 30px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 380px), 1fr)); padding: 6px 4px 18px; }
+.card { background: var(--card); border: 1px solid var(--line); border-radius: 6px; box-shadow: var(--shadow); overflow: hidden; display: flex; flex-direction: column; transition: transform .25s ease, opacity .25s ease, outline-color .25s; outline: 3px solid transparent; }
+.card:nth-child(odd) { transform: rotate(-.6deg); }
+.card:nth-child(even) { transform: rotate(.5deg); }
+.card:hover { transform: rotate(0) translateY(-3px); }
+.card.loved { outline-color: var(--leaf); }
+.card.nope { opacity: .5; }
+.card.nope img { filter: grayscale(.8); }
+
+.frame { aspect-ratio: 3 / 2; background: #eadfc6; position: relative; overflow: hidden; }
+.frame img { width: 100%; height: 100%; object-fit: cover; display: block; animation: fadein .7s ease both; }
+.painting::after { content: ""; position: absolute; inset: 0; background: linear-gradient(110deg, transparent 30%, rgba(255, 255, 255, .55) 50%, transparent 70%); background-size: 220% 100%; animation: shimmer 1.8s linear infinite; }
+.painting-label { position: absolute; inset: 0; display: grid; place-items: center; color: var(--muted); font-style: italic; z-index: 1; }
+.frame .retry { position: absolute; inset: auto 12px 12px auto; z-index: 2; }
+
+.card-body { padding: 14px 18px 18px; display: flex; flex-direction: column; gap: 4px; flex: 1; }
+.card-body h3 { font-size: 1.35rem; }
+.country { color: var(--muted); font-size: .95rem; }
+.tag { margin: 4px 0 6px; color: var(--accent); font-style: italic; }
+.card-body p { margin: 0 0 6px; }
+.card-body ul { margin: 4px 0 8px; padding-left: 20px; }
+.meta { color: var(--muted); font-size: .88rem; margin-top: auto; padding-top: 6px; }
+
+.actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+.chip { background: transparent; border: 1px solid var(--line); border-radius: 999px; padding: 6px 14px; font-size: .92rem; color: var(--ink); }
+.chip:hover { border-color: var(--accent); }
+.chip[aria-pressed="true"].love { background: var(--leaf); border-color: var(--leaf); color: #fff; }
+.chip[aria-pressed="true"].no { background: #6b5d4d; border-color: #6b5d4d; color: #fff; }
+.chip.go { margin-left: auto; background: var(--ink); color: var(--paper); border-color: var(--ink); }
+
+.refine { max-width: 760px; margin: 10px auto 0; background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: 16px 20px 20px; }
+.refine > label { color: var(--muted); }
+.refine .row { margin-top: 8px; }
+
+#chosen { max-width: 860px; margin: 0 auto; }
+.stage { width: 100%; height: auto; display: block; border-radius: 6px; box-shadow: var(--shadow); background: #eadfc6; }
+#chosen h2 { font-size: 2rem; margin-top: 18px; }
+.next { margin-top: 22px; padding: 16px 20px; border: 1px dashed var(--accent); border-radius: 8px; color: var(--muted); }
+
+footer { max-width: 1120px; margin: 0 auto; padding: 0 20px 36px; display: flex; flex-wrap: wrap; gap: 8px 20px; justify-content: space-between; color: var(--muted); font-size: .85rem; }
+#meter { font-variant-numeric: tabular-nums; }
+
+@keyframes shimmer { from { background-position: 120% 0; } to { background-position: -120% 0; } }
+@keyframes fadein { from { opacity: 0; transform: scale(1.02); } to { opacity: 1; transform: none; } }
+
+@media (max-width: 520px) {
+  .card:nth-child(odd), .card:nth-child(even) { transform: none; }
+  .panel { padding: 18px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+  .card:nth-child(odd), .card:nth-child(even), .card:hover { transform: none; }
+}

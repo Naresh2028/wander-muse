@@ -30,7 +30,13 @@ is used in the final experience). Track: *Build for Your World*.
  [6 SHARE]   static HTML storybook + mp4, every factual claim marked "verify before booking"
 ```
 
-Phase 1-2 is implemented (`src/wander/pipeline.py`). Everything else builds on the same client, cache and ledger.
+Phases 1 to 3 are implemented (`src/wander/pipeline.py`, `src/wander/web/`). Everything else builds on the same client,
+cache and ledger.
+
+Web flow: the browser calls `POST /api/discover` (Spark picks places while the style anchor is ensured in parallel),
+then fires one `POST /api/postcard` per card concurrently, so postcards appear as each one finishes. Sessions are kept
+in server memory, which is enough for a demo; the browser only ever receives public card fields (the painting prompt
+stays on the server).
 
 ## Where each model is used
 

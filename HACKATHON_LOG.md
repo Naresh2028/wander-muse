@@ -12,4 +12,5 @@ Code assistance: Claude (Anthropic) was used as a pair-programming assistant for
 
 | Date (2026) | What was built |
 |---|---|
+| Oct 29 (later) | Web UI: FastAPI backend (discover, per-card postcard painting, choose, spend meter), react-and-narrow loop (love / not this / free-text note feeds the next Spark round, already-shown places are never repeated), postcard-deck frontend in vanilla JS, browser-verified end to end against a stub API. First successful live calls to Muse Spark and Muse Image. |
 | Oct 29 | Repo created. Config, spend ledger with hard cap, disk cache, Meta client (Spark structured output + Muse Image with reference images), prompts, first pipeline slice, HTML postcard sheet, smoke test, offline tests. |
